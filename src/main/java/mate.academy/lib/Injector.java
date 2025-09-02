@@ -2,7 +2,6 @@ package mate.academy.lib;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import mate.academy.service.FileReaderService;
@@ -14,6 +13,10 @@ import mate.academy.service.impl.ProductServiceImpl;
 
 public class Injector {
     private static final Injector injector = new Injector();
+    private static Map<Class<?>, Class<?>> implementations = Map.of(
+            FileReaderService.class, FileReaderServiceImpl.class,
+            ProductParser.class, ProductParserImpl.class,
+            ProductService.class, ProductServiceImpl.class);
 
     private Map<Class<?>, Object> instances = new HashMap<>();
 
@@ -41,6 +44,7 @@ public class Injector {
                             + " in class " + interfaceClazz.getName());
                 }
             }
+
         }
         if (clazzImplementationInstance == null) {
             clazzImplementationInstance = createNewInstance(clazz);
@@ -49,10 +53,6 @@ public class Injector {
     }
 
     private Class<?> findImplementation(Class<?> clazz) {
-        Map<Class<?>, Class<?>> implementations = new HashMap<>();
-        implementations.put(FileReaderService.class, FileReaderServiceImpl.class);
-        implementations.put(ProductParser.class, ProductParserImpl.class);
-        implementations.put(ProductService.class, ProductServiceImpl.class);
         if (implementations.containsKey(clazz)) {
             return implementations.get(clazz);
         }
@@ -68,9 +68,9 @@ public class Injector {
             Object instance = constructor.newInstance();
             instances.put(clazz, instance);
             return instance;
-        } catch (NoSuchMethodException | InvocationTargetException
-                 | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Can`t create an instance of " + clazz.getName());
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Can`t create an instance of "
+                    + clazz.getName() + ". " + e.getMessage());
         }
     }
 }
