@@ -41,7 +41,7 @@ public class Injector {
                     field.set(clazzImplementationInstance, fieldInstance);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("Can`t initialize field " + field.getName()
-                            + " in class " + interfaceClazz.getName());
+                            + " in class " + interfaceClazz.getName(), e);
                 }
             }
 
@@ -70,7 +70,7 @@ public class Injector {
             return instance;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Can`t create an instance of "
-                    + clazz.getName() + ". " + e.getMessage());
+                    + clazz.getName() + ". " + e.getMessage(), e);
         }
     }
 }
